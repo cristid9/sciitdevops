@@ -43,7 +43,7 @@ jobs:
           echo "$INSTANCE_IPS" | jq -r '.[]' > ansible/instance-ips.txt
           echo "[servers]" > ansible/inventory.ini
           while IFS= read -r ip; do
-            echo "$ip ansible_user=ubuntu ansible_ssh_private_key_file=./scripts/devops.pem" >> ansible/inventory.ini
+            echo "$ip ansible_user=ubuntu ansible_ssh_private_key_file=./scripts/aws.pem" >> ansible/inventory.ini
           done < ansible/instance-ips.txt
 
       # Wait for SSH to be available
@@ -67,14 +67,14 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.AWS_SSH_PRIVATE_KEY }}" > ~/.ssh/aws.pem
-          chmod 400 ~/.ssh/devops.pem
+          chmod 400 ~/.ssh/aws.pem
 
       # Test SSH connection
       - name: Test SSH connection
         run: |
           INSTANCE_IP=$(terraform output -json instance_ips | jq -r '.[0]')
           echo "Trying to SSH into $INSTANCE_IP"
-          ssh -v -o StrictHostKeyChecking=no -i ~/.ssh/devops.pem ubuntu@$INSTANCE_IP
+          ssh -v -o StrictHostKeyChecking=no -i ~/.ssh/aws.pem ubuntu@$INSTANCE_IP
 
       # Install Ansible
       - name: Install Ansible
