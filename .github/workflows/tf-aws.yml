@@ -24,6 +24,14 @@ jobs:
           aws-secret-access-key: '${{ secrets.AWS_SECRET_ACCESS_KEY }}'
           aws-region: 'eu-west-1'
 
+      #  Add SSH Key from GitHub Secrets
+      - name: Add SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.AWS_SSH_PRIVATE_KEY }}" > ~/.ssh/aws.pem
+          chmod 400 ~/.ssh/aws.pem
+
+
       # Terraform Setup
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
@@ -63,12 +71,7 @@ jobs:
             echo "✅ SSH is available on $ip!"
           done
 
-      #  Add SSH Key from GitHub Secrets
-      - name: Add SSH Key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.AWS_SSH_PRIVATE_KEY }}" > ~/.ssh/aws.pem
-          chmod 400 ~/.ssh/aws.pem
+
 
       # Test SSH connection
       - name: Test SSH connection
