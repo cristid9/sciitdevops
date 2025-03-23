@@ -33,8 +33,6 @@ jobs:
       - name: Terraform Init
         run: terraform init
 
-      - name: Terraform Apply
-        run: terraform apply -auto-approve
 
       # Save instance IPs and create inventory file for Ansible
       - name: Save instance IPs and create inventory
@@ -43,7 +41,7 @@ jobs:
           echo "$INSTANCE_IPS" | jq -r '.[]' > ansible/instance-ips.txt
           echo "[servers]" > ansible/inventory.ini
           while IFS= read -r ip; do
-            echo "$ip ansible_user=ubuntu ansible_ssh_private_key_file=./scripts/aws.pem" >> ansible/inventory.ini
+            echo "$ip ansible_user=ubuntu ansible_ssh_private_key_file=./scripts/devops.pem" >> ansible/inventory.ini
           done < ansible/instance-ips.txt
 
       # Wait for SSH to be available
@@ -80,6 +78,10 @@ jobs:
       - name: Install Ansible
         run: sudo apt update && sudo apt install -y ansible
 
-      # Run Ansible Playbook
-      - name: Run Ansible Playbook
-        run: ansible-playbook -i ansible/inventory.ini ansible/playbook.yaml -vvv
+      # # Run Ansible Playbook
+      # - name: Run Ansible Playbook
+      #   run: ansible-playbook -i ansible/inventory.ini ansible/playbook.yaml -vvv
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+
