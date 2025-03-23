@@ -112,9 +112,9 @@ resource "aws_instance" "k3s_vm" {
     Name = "k3s-server"
   }
 
-  provisioner "local-exec" {
-    command = "sleep 90 && ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${self.public_ip}, -u ubuntu --private-key=./aws.pem install_k3s.yml -vv"
-  }
+  # provisioner "local-exec" {
+  #   command = "sleep 90 && ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${self.public_ip}, -u ubuntu --private-key=./aws.pem install_k3s.yml -vv"
+  # }
 
   # Modify root block device to have more physical storage (e.g., 100 GB)
   root_block_device {
