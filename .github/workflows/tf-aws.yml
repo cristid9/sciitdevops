@@ -30,7 +30,8 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.AWS_SSH_PRIVATE_KEY }}" > ~/.ssh/aws.pem
           chmod 400 ~/.ssh/aws.pem
-
+          echo "${{ secrets.AWS_SSH_PRIVATE_KEY }}" > ./aws.pem
+          chmod 400 ./aws.pem
 
       # Terraform Setup
       - name: Setup Terraform
