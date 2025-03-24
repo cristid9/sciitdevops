@@ -43,7 +43,7 @@ jobs:
           terraform_wrapper: false
 
       - name: Terraform Init
-        run: terraform init
+        run: terraform init -y
 
       - name: Terraform Apply
         run: terraform apply -auto-approve
@@ -99,7 +99,9 @@ jobs:
 
       # Run Ansible Playbook
       - name: Run Ansible Playbook
-        run: ansible-playbook -i inventory.ini install_k3s.yml -vvv
+        run: |
+          cat -A inventory.ini
+          ansible-playbook -i inventory.ini install_k3s.yml -vvv
 
 
 
