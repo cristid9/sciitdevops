@@ -52,17 +52,17 @@ jobs:
         run: |
           INSTANCE_IPS=$(terraform output -json k3s_vm_public_ip)
 
-          # Check if it's a JSON array or string
+          # Check if it's a JSON array or a string
           if echo "$INSTANCE_IPS" | jq -e 'if type == "string" then empty else . end' >/dev/null; then
-            echo "$INSTANCE_IPS" | jq -r '.[]' > instance-ips.txt
+            IP_LIST=$(echo "$INSTANCE_IPS" | jq -r '.[]')
           else
-            echo "$INSTANCE_IPS" | jq -r '.' > instance-ips.txt
+            IP_LIST=$(echo "$INSTANCE_IPS" | jq -r '.')
           fi
 
+          # Create inventory.ini
           echo "[servers]" > inventory.ini
-          while IFS= read -r ip; do
-            echo "$ip ansible_user=ubuntu ansible_ssh_private_key_file=./aws.pem" >> inventory.ini
-          done < instance-ips.txt
+          echo "$IP_LIST ansible_user=ubuntu ansible_ssh_private_key_file=./aws.pem" >> inventory.ini
+
 
       # Wait for SSH to be available
       - name: Wait for SSH to be available
@@ -85,9 +85,11 @@ jobs:
       # Test SSH connection
       - name: Test SSH connection
         run: |
-          INSTANCE_IP=$(terraform output -json instance_ips | jq -r '.[0]')
+          INSTANCE_IP=$(terraform output -json k3s_vm_public_ip | jq -r 'if type == "string" then . else .[0] end')
+
           echo "Trying to SSH into $INSTANCE_IP"
           ssh -v -o StrictHostKeyChecking=no -i ~/.ssh/aws.pem ubuntu@$INSTANCE_IP
+
 
       # Install Ansiblegit 
       - name: Install Ansible
