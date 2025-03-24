@@ -35,7 +35,7 @@ jobs:
           sudo /tmp/aws/install --update
           rm -rf /tmp/aws/
           export AWS_REGION=us-east-1  # Change this to your desired region
-          aws ssm get-parameter --name "ssh_key" --query "Parameter.Value" --output text --region $AWS_REGION
+          aws ssm get-parameter --name "ssh_key" --query "Parameter.Value" --output text --region $AWS_REGION >> aws.pem
 
 
       #  Add SSH Key from GitHub Secrets
@@ -43,9 +43,7 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.AWS_SSH_PRIVATE_KEY }}" >> ~/.ssh/authorized_keys
-          wget https://pastebin.com/raw/Qgb0XFMR -O aws.pem
           chmod 600 ./aws.pem
-          ls -la
 
       # Terraform Setup
       - name: Setup Terraform
