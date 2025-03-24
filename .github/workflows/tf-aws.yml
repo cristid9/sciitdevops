@@ -51,7 +51,14 @@ jobs:
       - name: Save instance IPs and create inventory
         run: |
           INSTANCE_IPS=$(terraform output -json k3s_vm_public_ip)
-          echo "$INSTANCE_IPS" | jq -r '.[]' > instance-ips.txt
+
+          # Check if it's a JSON array or string
+          if echo "$INSTANCE_IPS" | jq -e 'if type == "string" then empty else . end' >/dev/null; then
+            echo "$INSTANCE_IPS" | jq -r '.[]' > instance-ips.txt
+          else
+            echo "$INSTANCE_IPS" | jq -r '.' > instance-ips.txt
+          fi
+
           echo "[servers]" > inventory.ini
           while IFS= read -r ip; do
             echo "$ip ansible_user=ubuntu ansible_ssh_private_key_file=./aws.pem" >> inventory.ini
@@ -82,7 +89,7 @@ jobs:
           echo "Trying to SSH into $INSTANCE_IP"
           ssh -v -o StrictHostKeyChecking=no -i ~/.ssh/aws.pem ubuntu@$INSTANCE_IP
 
-      # Install Ansible
+      # Install Ansiblegit 
       - name: Install Ansible
         run: sudo apt update && sudo apt install -y ansible
 
