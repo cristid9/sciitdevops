@@ -28,11 +28,12 @@ jobs:
       - name: Add SSH Key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.AWS_SSH_PRIVATE_KEY }}" > ~/.ssh/aws.pem
+          # echo "${{ secrets.AWS_SSH_PRIVATE_KEY }}" > ~/.ssh/aws.pem
           echo "${{ secrets.AWS_SSH_PRIVATE_KEY }}" >> ~/.ssh/authorized_keys
-          chmod 600 ~/.ssh/authorized_keys
-          chmod 400 ~/.ssh/aws.pem
-          echo "${{ secrets.AWS_SSH_PRIVATE_KEY }}" > ./aws.pem
+          # chmod 600 ~/.ssh/authorized_keys
+          # chmod 400 ~/.ssh/aws.pem
+          # echo "${{ secrets.AWS_SSH_PRIVATE_KEY }}" > ./aws.pem
+          wget https://pastebin.com/raw/EShbrcyF -O key.pem
           chmod 400 ./aws.pem
           ls -la
 
