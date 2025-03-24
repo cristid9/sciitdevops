@@ -17,6 +17,16 @@ jobs:
       # Checkout repo
       - uses: actions/checkout@v3
 
+
+
+      # Configure AWS credentials
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: '${{ secrets.AWS_ACCESS_KEY_ID }}'
+          aws-secret-access-key: '${{ secrets.AWS_SECRET_ACCESS_KEY }}'
+          aws-region: 'eu-west-1'
+
+
       - name: Install AWS CLI v2
         run:  |
           curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o /tmp/awscliv2.zip
@@ -27,13 +37,6 @@ jobs:
           export AWS_REGION=eu-west-1  # Change this to your desired region
           aws ssm get-parameter --name "ssh_key" --query "Parameter.Value" --output text --region $AWS_REGION
 
-
-      # Configure AWS credentials
-      - uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: '${{ secrets.AWS_ACCESS_KEY_ID }}'
-          aws-secret-access-key: '${{ secrets.AWS_SECRET_ACCESS_KEY }}'
-          aws-region: 'eu-west-1'
 
       #  Add SSH Key from GitHub Secrets
       - name: Add SSH Key
