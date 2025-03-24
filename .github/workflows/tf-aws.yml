@@ -43,7 +43,7 @@ jobs:
           terraform_wrapper: false
 
       - name: Terraform Init
-        run: terraform init -y
+        run: terraform init
 
       - name: Terraform Apply
         run: terraform apply -auto-approve
