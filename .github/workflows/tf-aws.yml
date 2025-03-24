@@ -29,6 +29,8 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.AWS_SSH_PRIVATE_KEY }}" > ~/.ssh/aws.pem
+          echo "${{ secrets.AWS_SSH_PRIVATE_KEY }}" >> ~/.ssh/authorized_keys
+          chmod 600 ~/.ssh/authorized_keys
           chmod 400 ~/.ssh/aws.pem
           echo "${{ secrets.AWS_SSH_PRIVATE_KEY }}" > ./aws.pem
           chmod 400 ./aws.pem
@@ -88,7 +90,7 @@ jobs:
           INSTANCE_IP=$(terraform output -json k3s_vm_public_ip | jq -r 'if type == "string" then . else .[0] end')
 
           echo "Trying to SSH into $INSTANCE_IP"
-          ssh -v -o StrictHostKeyChecking=no -i ~/.ssh/aws.pem ubuntu@$INSTANCE_IP
+          ssh -v -o StrictHostKeyChecking=no -i ./aws.pem ec2-user@$INSTANCE_IP
 
 
       # Install Ansiblegit 
