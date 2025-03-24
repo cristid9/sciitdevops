@@ -97,7 +97,9 @@ jobs:
         run: chmod 400 ./aws.pem
 
       - name: Check SSH Key Format
-        run: ssh-keygen -l -f ./aws.pem || echo "Invalid SSH key!"
+        run: |
+          sudo apt-get install libssl-dev
+          ssh-keygen -l -f ./aws.pem || echo "Invalid SSH key!"
 
       - name: Convert SSH key to RSA format
         run: ssh-keygen -p -m PEM -f ./aws.pem -o -P "" -N ""
