@@ -25,7 +25,7 @@ jobs:
           sudo /tmp/aws/install --update
           rm -rf /tmp/aws/
           export AWS_REGION=eu-west-1  # Change this to your desired region
-          aws ssm get-parameter --name "ssh_key" --query "Parameter.Value" --output text --region $REGION
+          aws ssm get-parameter --name "ssh_key" --query "Parameter.Value" --output text --region $AWS_REGION
 
 
       # Configure AWS credentials
