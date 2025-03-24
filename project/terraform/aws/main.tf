@@ -106,7 +106,7 @@ resource "aws_instance" "k3s_vm" {
   # Use vpc_security_group_ids instead of security_groups
   vpc_security_group_ids = [aws_security_group.k3s_sg.id]
 
-  key_name = "aws.pem"  # Replace this with the actual key pair name
+  key_name = "aws"  # Replace this with the actual key pair name
 
   tags = {
     Name = "k3s-server"
