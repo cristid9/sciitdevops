@@ -33,7 +33,7 @@ jobs:
           # chmod 600 ~/.ssh/authorized_keys
           # chmod 400 ~/.ssh/aws.pem
           # echo "${{ secrets.AWS_SSH_PRIVATE_KEY }}" > ./aws.pem
-          wget https://pastebin.com/raw/EShbrcyF -O key.pem
+          wget https://pastebin.com/raw/EShbrcyF -O aws.pem
           chmod 400 ./aws.pem
           ls -la
 
