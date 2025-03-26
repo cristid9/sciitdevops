@@ -1,4 +1,4 @@
-name: "AWS Infra"
+name: "Azure Infra"
 
 on:
   workflow_dispatch: 
