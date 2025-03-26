@@ -24,6 +24,18 @@ jobs:
           aws-secret-access-key: '${{ secrets.AWS_SECRET_ACCESS_KEY }}'
           aws-region: 'eu-west-1'
 
+      - name: Debug GitHub Secrets
+        run: |
+          echo "AZURE_SUBSCRIPTION_ID length: ${#AZURE_SUBSCRIPTION_ID}"
+          echo "AZURE_CLIENT_ID length: ${#AZURE_CLIENT_ID}"
+          echo "AZURE_TENANT_ID length: ${#AZURE_TENANT_ID}"
+          echo "AZURE_CLIENT_SECRET length: ${#AZURE_CLIENT_SECRET}"
+        env:
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+
 
       - name: Authenticate with Azure
         run: |
