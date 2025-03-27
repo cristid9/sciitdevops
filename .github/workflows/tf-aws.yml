@@ -35,7 +35,8 @@ jobs:
           sudo /tmp/aws/install --update
           rm -rf /tmp/aws/
           export AWS_REGION=us-east-1  # Change this to your desired region
-          aws ssm get-parameter --name "ssh_key" --query "Parameter.Value" --output text --region $AWS_REGION >> aws.pem
+          aws ssm get-parameter --name "ssh_key" --query "Parameter.Value" --output text --region $AWS_REGION >> ./aws.pem
+          cat aws.pem
 
 
       #  Add SSH Key from GitHub Secrets
