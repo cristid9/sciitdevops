@@ -78,9 +78,7 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.AZURE_SSH_PRIVATE_KEY }}" >> ~/.ssh/authorized_keys
-          # echo "${{ secrets.AZURE_SSH_PRIVATE_KEY }}" >> ./azure.pem
           chmod 600 ./azure.pem
-          # echo "${{ secrets.AZURE_SSH_PUBLIC_KEY }}" >> ./azure.pem.pub
           ls -la
 
       # Terraform Setup
