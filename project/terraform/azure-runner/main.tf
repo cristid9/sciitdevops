@@ -5,9 +5,8 @@ variable "location" {
   default     = "East US"
 }
 
-# Resource Group
 resource "azurerm_resource_group" "rg" {
-  name     = "python-rg"
+  name     = "python-rg-new"  # Change this name
   location = var.location
 }
 
