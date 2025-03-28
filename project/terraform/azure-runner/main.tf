@@ -82,7 +82,8 @@ resource "azurerm_public_ip" "ip" {
   name                = "python-public-ip"
   location            = var.location
   resource_group_name = azurerm_resource_group.rg.name
-  allocation_method   = "Dynamic"
+  allocation_method   = "Static"  # <-- Change this from Dynamic to Static
+  sku                = "Standard"  # Explicitly define SKU
 }
 
 # Linux Virtual Machine
