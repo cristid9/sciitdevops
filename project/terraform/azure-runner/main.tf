@@ -33,6 +33,11 @@ resource "azurerm_network_security_group" "nsg" {
   resource_group_name = azurerm_resource_group.rg2.name
 }
 
+resource "azurerm_subnet_network_security_group_association" "nsg_assoc" {
+  subnet_id                 = azurerm_subnet.public_subnet.id
+  network_security_group_id = azurerm_network_security_group.nsg.id
+}
+
 # Security rules
 resource "azurerm_network_security_rule" "allow_ssh" {
   name                        = "Allow-SSH"
