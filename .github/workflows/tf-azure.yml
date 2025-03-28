@@ -115,7 +115,7 @@ jobs:
 
           # Create inventory.ini
           echo "[servers]" > inventory.ini
-          echo "$IP_LIST ansible_user=ubuntu ansible_ssh_private_key_file=./azure.pem" >> inventory.ini
+          echo "$IP_LIST ansible_user=azureuser ansible_ssh_private_key_file=./azure.pem" >> inventory.ini
 
 
       # Wait for SSH to be available
@@ -162,7 +162,7 @@ jobs:
           INSTANCE_IP=$(terraform output -json k3s_vm_public_ip | jq -r 'if type == "string" then . else .[0] end')
 
           echo "Trying to SSH into $INSTANCE_IP"
-          ssh -vvv -o StrictHostKeyChecking=no -i ./azure.pem ubuntu@$INSTANCE_IP
+          ssh -vvv -o StrictHostKeyChecking=no -i ./azure.pem azureuser@$INSTANCE_IP
 
 
       # Install Ansiblegit 
