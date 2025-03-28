@@ -1,6 +1,3 @@
-provider "azurerm" {
-  features {}
-}
 
 variable "location" {
   description = "Azure region for the infrastructure"
