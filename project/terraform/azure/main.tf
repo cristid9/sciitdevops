@@ -1,31 +1,31 @@
-variable "AZURE_SUBSCRIPTION_ID" {
-  description = "Azure Subscription ID"
-  type        = string
-}
+# variable "AZURE_SUBSCRIPTION_ID" {
+#   description = "Azure Subscription ID"
+#   type        = string
+# }
 
-variable "AZURE_CLIENT_ID" {
-  description = "Azure Client ID"
-  type        = string
-}
+# variable "AZURE_CLIENT_ID" {
+#   description = "Azure Client ID"
+#   type        = string
+# }
 
-variable "AZURE_CLIENT_SECRET" {
-  description = "Azure Client Secret"
-  type        = string
-  sensitive   = true
-}
+# variable "AZURE_CLIENT_SECRET" {
+#   description = "Azure Client Secret"
+#   type        = string
+#   sensitive   = true
+# }
 
-variable "AZURE_TENANT_ID" {
-  description = "Azure Tenant ID"
-  type        = string
-}
+# variable "AZURE_TENANT_ID" {
+#   description = "Azure Tenant ID"
+#   type        = string
+# }
 
-provider "azurerm" {
-  features {}
-  subscription_id = var.AZURE_SUBSCRIPTION_ID
-  client_id       = var.AZURE_CLIENT_ID
-  client_secret   = var.AZURE_CLIENT_SECRET
-  tenant_id       = var.AZURE_TENANT_ID
-}
+# provider "azurerm" {
+#   features {}
+#   subscription_id = var.AZURE_SUBSCRIPTION_ID
+#   client_id       = var.AZURE_CLIENT_ID
+#   client_secret   = var.AZURE_CLIENT_SECRET
+#   tenant_id       = var.AZURE_TENANT_ID
+# }
 
 # Resource Group
 resource "azurerm_resource_group" "test" {

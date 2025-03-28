@@ -44,6 +44,16 @@ jobs:
           echo "TF_VAR_AZURE_TENANT_ID=${{ secrets.AZURE_TENANT_ID }}" >> $GITHUB_ENV
           echo $GITHUB_ENV
 
+      - name: "Set up providers.tf"
+        run: |
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o /tmp/awscliv2.zip
+          unzip -q /tmp/awscliv2.zip -d /tmp
+          rm /tmp/awscliv2.zip
+          sudo /tmp/aws/install --update
+          rm -rf /tmp/aws/
+          export AWS_REGION=us-east-1  # Change this to your desired region
+          aws ssm get-parameter --name "provider_azure" --query "Parameter.Value" --output text --region $AWS_REGION >> ./providers.tf
+          cat aws.pem
 
 
       # - name: Authenticate with Azure
@@ -68,9 +78,9 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.AZURE_SSH_PRIVATE_KEY }}" >> ~/.ssh/authorized_keys
-          echo "${{ secrets.AZURE_SSH_PRIVATE_KEY }}" >> azure.pem
+          echo "${{ secrets.AZURE_SSH_PRIVATE_KEY }}" >> ./azure.pem
           chmod 600 ./azure.pem
-          echo "${{ secrets.AZURE_SSH_PUBLIC_KEY }}" >> azure.pem.pub
+          echo "${{ secrets.AZURE_SSH_PUBLIC_KEY }}" >> ./azure.pem.pub
           ls -la
 
       # Terraform Setup
