@@ -1,4 +1,4 @@
-name: "AWS Runner Infra"
+name: "Azure Runner Infra"
 
 on:
   workflow_dispatch: 
@@ -11,39 +11,74 @@ jobs:
     defaults:
         run:
           shell: bash
-          working-directory: ./project/terraform/aws-runner/
+          working-directory: ./project/terraform/azure-runner
 
     steps:
       # Checkout repo
       - uses: actions/checkout@v3
-
-
 
       # Configure AWS credentials
       - uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: '${{ secrets.AWS_ACCESS_KEY_ID }}'
           aws-secret-access-key: '${{ secrets.AWS_SECRET_ACCESS_KEY }}'
-          aws-region: 'us-east-1'
+          aws-region: 'eu-west-1'
 
+      - name: Debug GitHub Secrets
+        run: |
+          echo "AZURE_SUBSCRIPTION_ID length: ${#AZURE_SUBSCRIPTION_ID}"
+          echo "AZURE_CLIENT_ID length: ${#AZURE_CLIENT_ID}"
+          echo "AZURE_TENANT_ID length: ${#AZURE_TENANT_ID}"
+          echo "AZURE_CLIENT_SECRET length: ${#AZURE_CLIENT_SECRET}"
+        env:
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
 
-      - name: Install AWS CLI v2
-        run:  |
+      - name: Set up Terraform environment variables
+        run: |
+          echo "TF_VAR_AZURE_SUBSCRIPTION_ID=${{ secrets.AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
+          echo "TF_VAR_AZURE_CLIENT_ID=${{ secrets.AZURE_CLIENT_ID }}" >> $GITHUB_ENV
+          echo "TF_VAR_AZURE_CLIENT_SECRET=${{ secrets.AZURE_CLIENT_SECRET }}" >> $GITHUB_ENV
+          echo "TF_VAR_AZURE_TENANT_ID=${{ secrets.AZURE_TENANT_ID }}" >> $GITHUB_ENV
+          echo $GITHUB_ENV
+
+      - name: "Set up providers.tf"
+        run: |
           curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o /tmp/awscliv2.zip
           unzip -q /tmp/awscliv2.zip -d /tmp
           rm /tmp/awscliv2.zip
           sudo /tmp/aws/install --update
           rm -rf /tmp/aws/
           export AWS_REGION=us-east-1  # Change this to your desired region
-          aws ssm get-parameter --name "ssh_key" --query "Parameter.Value" --output text --region $AWS_REGION >> aws.pem
+          aws ssm get-parameter --name "provider_azure" --query "Parameter.Value" --output text --region $AWS_REGION >> ./providers.tf
+
+
+      # - name: Authenticate with Azure
+      #   run: |
+      #     echo "Logging into Azure..."
+      #     az login --service-principal \
+      #       -u $AZURE_CLIENT_ID \
+      #       -p $AZURE_CLIENT_SECRET \
+      #       --tenant $AZURE_TENANT_ID
+          
+      #     az account set --subscription $AZURE_SUBSCRIPTION_ID
+      #   env:
+      #     AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      #     AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+      #     AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      #     AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
 
 
       #  Add SSH Key from GitHub Secrets
       - name: Add SSH Key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.AWS_SSH_PRIVATE_KEY }}" >> ~/.ssh/authorized_keys
-          chmod 600 ./aws.pem
+          echo "${{ secrets.AZURE_SSH_PRIVATE_KEY }}" >> ~/.ssh/authorized_keys
+          chmod 600 ./azure.pem
+          ls -la
 
       # Terraform Setup
       - name: Setup Terraform
@@ -56,12 +91,17 @@ jobs:
 
       - name: Terraform Apply
         run: terraform apply -auto-approve
+        env:
+          TF_VAR_azure_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          TF_VAR_azure_client_id: ${{ secrets.AZURE_CLIENT_ID }}
+          TF_VAR_azure_client_secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+          TF_VAR_azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
 
 
       # Save instance IPs and create inventory file for Ansible
       - name: Save instance IPs and create inventory
         run: |
-          INSTANCE_IPS=$(terraform output -json python_vm_public_ip)
+          INSTANCE_IPS=$(terraform output -json test_vm_public_ip)
 
           # Check if it's a JSON array or a string
           if echo "$INSTANCE_IPS" | jq -e 'if type == "string" then empty else . end' >/dev/null; then
@@ -72,7 +112,7 @@ jobs:
 
           # Create inventory.ini
           echo "[servers]" > inventory.ini
-          echo "$IP_LIST ansible_user=ubuntu ansible_ssh_private_key_file=./aws.pem" >> inventory.ini
+          echo "$IP_LIST ansible_user=azureuser ansible_ssh_private_key_file=./azure.pem" >> inventory.ini
 
 
       # Wait for SSH to be available
@@ -96,28 +136,27 @@ jobs:
       # Test SSH connection
       - name: Check SSH Key
         run: |
-          if [ ! -f ./aws.pem ]; then
+          if [ ! -f ./azure.pem ]; then
             echo "ERROR: SSH key not found!"
             exit 1
           fi
-          ls -l ./aws.pem
+          ls -l ./azure.pem
 
       - name: Set correct permissions for SSH key
-        run: chmod 600 ./aws.pem
+        run: chmod 600 ./azure.pem
 
       - name: Check SSH Key Format
         run: |
           sudo apt-get install libssl-dev
-          cat ./aws.pem
-          ssh-keygen -l -f ./aws.pem || echo "Invalid SSH key!"
+          cat ./azure.pem
+          ssh-keygen -l -f ./azure.pem || echo "Invalid SSH key!"
 
       - name: Convert SSH key to RSA format
-        run: ssh-keygen -p -m PEM -f ./aws.pem -o -P "" -N ""
+        run: ssh-keygen -p -m PEM -f ./azure.pem -o -P "" -N ""
 
       - name: Test SSH connection
         run: |
-          INSTANCE_IP=$(terraform output -json python_vm_public_ip | jq -r 'if type == "string" then . else .[0] end')
+          INSTANCE_IP=$(terraform output -json test_vm_public_ip | jq -r 'if type == "string" then . else .[0] end')
 
           echo "Trying to SSH into $INSTANCE_IP"
-          ssh -vvv -o StrictHostKeyChecking=no -i ./aws.pem ubuntu@$INSTANCE_IP
-
+          ssh -vvv -o StrictHostKeyChecking=no -i ./azure.pem azureuser@$INSTANCE_IP
