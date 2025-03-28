@@ -5,8 +5,8 @@ variable "location" {
   default     = "East US"
 }
 
-resource "azurerm_resource_group" "rg" {
-  name     = "python-rg-new"  # Change this name
+resource "azurerm_resource_group" "rg2" {
+  name     = "python-rg2-new"  # Change this name
   location = var.location
 }
 
@@ -14,14 +14,14 @@ resource "azurerm_resource_group" "rg" {
 resource "azurerm_virtual_network" "vnet" {
   name                = "python-vnet"
   location            = var.location
-  resource_group_name = azurerm_resource_group.rg.name
+  resource_group_name = azurerm_resource_group.rg2.name
   address_space       = ["10.0.0.0/16"]
 }
 
 # Subnets
 resource "azurerm_subnet" "public_subnet" {
   name                 = "public-subnet"
-  resource_group_name  = azurerm_resource_group.rg.name
+  resource_group_name  = azurerm_resource_group.rg2.name
   virtual_network_name = azurerm_virtual_network.vnet.name
   address_prefixes     = ["10.0.3.0/24"]
 }
@@ -30,7 +30,7 @@ resource "azurerm_subnet" "public_subnet" {
 resource "azurerm_network_security_group" "nsg" {
   name                = "python-nsg"
   location            = var.location
-  resource_group_name = azurerm_resource_group.rg.name
+  resource_group_name = azurerm_resource_group.rg2.name
 }
 
 # Security rules
@@ -44,7 +44,7 @@ resource "azurerm_network_security_rule" "allow_ssh" {
   destination_port_range      = "22"
   source_address_prefix       = "*"
   destination_address_prefix  = "*"
-  resource_group_name         = azurerm_resource_group.rg.name
+  resource_group_name         = azurerm_resource_group.rg2.name
   network_security_group_name = azurerm_network_security_group.nsg.name
 }
 
@@ -58,7 +58,7 @@ resource "azurerm_network_security_rule" "allow_http" {
   destination_port_range      = "8080"
   source_address_prefix       = "*"
   destination_address_prefix  = "*"
-  resource_group_name         = azurerm_resource_group.rg.name
+  resource_group_name         = azurerm_resource_group.rg2.name
   network_security_group_name = azurerm_network_security_group.nsg.name
 }
 
@@ -66,7 +66,7 @@ resource "azurerm_network_security_rule" "allow_http" {
 resource "azurerm_network_interface" "nic" {
   name                = "python-nic"
   location            = var.location
-  resource_group_name = azurerm_resource_group.rg.name
+  resource_group_name = azurerm_resource_group.rg2.name
 
   ip_configuration {
     name                          = "public-ip"
@@ -80,7 +80,7 @@ resource "azurerm_network_interface" "nic" {
 resource "azurerm_public_ip" "ip" {
   name                = "python-public-ip"
   location            = var.location
-  resource_group_name = azurerm_resource_group.rg.name
+  resource_group_name = azurerm_resource_group.rg2.name
   allocation_method   = "Static"  # <-- Change this from Dynamic to Static
   sku                = "Standard"  # Explicitly define SKU
 }
@@ -89,7 +89,7 @@ resource "azurerm_public_ip" "ip" {
 resource "azurerm_linux_virtual_machine" "vm" {
   name                = "python-vm"
   location            = var.location
-  resource_group_name = azurerm_resource_group.rg.name
+  resource_group_name = azurerm_resource_group.rg2.name
   size               = "Standard_B2s"
   admin_username      = "azureuser"
 
