@@ -145,12 +145,6 @@ jobs:
       - name: Set correct permissions for SSH key
         run: chmod 600 ./azure.pem
 
-      - name: Check SSH Key Format
-        run: |
-          sudo apt-get install libssl-dev
-          cat ./azure.pem
-          ssh-keygen -l -f ./azure.pem || echo "Invalid SSH key!"
-
       - name: Convert SSH key to RSA format
         run: ssh-keygen -p -m PEM -f ./azure.pem -o -P "" -N ""
 
