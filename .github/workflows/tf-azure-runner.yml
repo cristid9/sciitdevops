@@ -159,4 +159,5 @@ jobs:
           INSTANCE_IP=$(terraform output -json vm_public_ip | jq -r 'if type == "string" then . else .[0] end')
 
           echo "Trying to SSH into $INSTANCE_IP"
+          echo "ssh -vvv -o StrictHostKeyChecking=no -i ./azure.pem azureuser@$INSTANCE_IP"
           ssh -vvv -o StrictHostKeyChecking=no -i ./azure.pem azureuser@$INSTANCE_IP
