@@ -139,10 +139,10 @@ output "test_vm_public_ip" {
   value       = azurerm_public_ip.test_pip.ip_address
 }
 
-resource "null_resource" "ansible_playbook" {
-  depends_on = [azurerm_linux_virtual_machine.test_vm]
+# resource "null_resource" "ansible_playbook" {
+#   depends_on = [azurerm_linux_virtual_machine.test_vm]
 
-  provisioner "local-exec" {
-    command = "sleep 90 && ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${azurerm_public_ip.test_pip.ip_address}, -u azureuser --private-key=./azure.pem install_k3s.yml -vv"
-  }
-}
+#   provisioner "local-exec" {
+#     command = "sleep 90 && ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${azurerm_public_ip.test_pip.ip_address}, -u azureuser --private-key=./azure.pem install_k3s.yml -vv"
+#   }
+# }
